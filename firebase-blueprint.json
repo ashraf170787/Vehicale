@@ -1,0 +1,276 @@
+{
+  "entities": {
+    "Vehicle": {
+      "title": "Vehicle",
+      "description": "Company fleet vehicle entity",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "vehicleType": { "type": "string", "maxLength": 64 },
+        "vehicleModel": { "type": "string", "maxLength": 64 },
+        "driverName": { "type": "string", "maxLength": 128 },
+        "driverId": { "type": "string", "maxLength": 64 },
+        "purchaseDate": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["Active", "Inactive"] },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "vehicleNo", "vehicleType", "vehicleModel", "driverName", "status", "createdAt"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Workshop, fuel station or parts vendor",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "category": { "type": "string", "maxLength": 64 },
+        "contactPerson": { "type": "string", "maxLength": 128 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "address": { "type": "string", "maxLength": 256 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "name", "category", "createdAt"]
+    },
+    "MaintenanceTransaction": {
+      "title": "MaintenanceTransaction",
+      "description": "Workshop servicing and maintenance record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "serviceType": { "type": "string", "maxLength": 64 },
+        "partsDescription": { "type": "string", "maxLength": 500 },
+        "supplier": { "type": "string", "maxLength": 128 },
+        "quantity": { "type": "number" },
+        "approvedAmount": { "type": "number" },
+        "billNo": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "paidDate": { "type": "string", "maxLength": 32 },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "allocationType": { "type": "string", "enum": ["Single", "Multiple", "All"] },
+        "createdBy": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "date", "vehicleNo", "serviceType", "partsDescription", "supplier", "amount", "paidAmount", "dueAmount", "paymentStatus", "createdAt"]
+    },
+    "FuelTransaction": {
+      "title": "FuelTransaction",
+      "description": "Fuel fill-up transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "fuelType": { "type": "string", "maxLength": 32 },
+        "quantity": { "type": "number" },
+        "unitPrice": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "slipNo": { "type": "string", "maxLength": 128 },
+        "supplier": { "type": "string", "maxLength": 128 },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "paymentDate": { "type": "string", "maxLength": 32 },
+        "odometerReading": { "type": "number" },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "date", "vehicleNo", "fuelType", "quantity", "unitPrice", "totalAmount", "supplier", "paymentStatus", "createdAt"]
+    },
+    "DriverSalaryTransaction": {
+      "title": "DriverSalaryTransaction",
+      "description": "Monthly driver payroll record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "driverName": { "type": "string", "maxLength": 128 },
+        "driverId": { "type": "string", "maxLength": 64 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "basicSalary": { "type": "number" },
+        "allowance": { "type": "number" },
+        "overtime": { "type": "number" },
+        "otherPayment": { "type": "number" },
+        "deduction": { "type": "number" },
+        "netSalary": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "paymentDate": { "type": "string", "maxLength": 32 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "month", "year", "driverName", "vehicleNo", "basicSalary", "netSalary", "paymentStatus", "createdAt"]
+    },
+    "DocumentRenewal": {
+      "title": "DocumentRenewal",
+      "description": "Fitness, tax token, insurance renewal record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "documentType": { "type": "string", "maxLength": 64 },
+        "documentNumber": { "type": "string", "maxLength": 128 },
+        "expiryDate": { "type": "string", "maxLength": 32 },
+        "renewalDate": { "type": "string", "maxLength": 32 },
+        "renewalCost": { "type": "number" },
+        "supplier": { "type": "string", "maxLength": 128 },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "paidDate": { "type": "string", "maxLength": 32 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "vehicleNo", "documentType", "documentNumber", "expiryDate", "renewalDate", "renewalCost", "paymentStatus", "createdAt"]
+    },
+    "PoliceCase": {
+      "title": "PoliceCase",
+      "description": "Traffic fine and prosecution ticket",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "caseType": { "type": "string", "maxLength": 64 },
+        "caseNumber": { "type": "string", "maxLength": 128 },
+        "description": { "type": "string", "maxLength": 500 },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "paidDate": { "type": "string", "maxLength": 32 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "date", "vehicleNo", "caseType", "caseNumber", "amount", "paidAmount", "dueAmount", "paymentStatus", "createdAt"]
+    },
+    "OtherExpense": {
+      "title": "OtherExpense",
+      "description": "Miscellaneous fleet expense",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "expenseType": { "type": "string", "maxLength": 64 },
+        "description": { "type": "string", "maxLength": 500 },
+        "supplier": { "type": "string", "maxLength": 128 },
+        "billNo": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid", "Due", "Overdue"] },
+        "paidDate": { "type": "string", "maxLength": 32 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "allocationType": { "type": "string", "enum": ["Single", "Multiple", "All"] },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "date", "vehicleNo", "expenseType", "description", "amount", "paidAmount", "dueAmount", "paymentStatus", "createdAt"]
+    },
+    "VehicleMonthlyIncome": {
+      "title": "VehicleMonthlyIncome",
+      "description": "Monthly revenue and client earnings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "clientName": { "type": "string", "maxLength": 128 },
+        "billingType": { "type": "string", "maxLength": 64 },
+        "contractAmount": { "type": "number" },
+        "bonusOrExtraAmount": { "type": "number" },
+        "totalIncome": { "type": "number" },
+        "receivedAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "paymentStatus": { "type": "string", "enum": ["Paid", "Partial", "Unpaid"] },
+        "receivedDate": { "type": "string", "maxLength": 32 },
+        "invoiceNo": { "type": "string", "maxLength": 128 },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "month", "year", "vehicleNo", "clientName", "billingType", "contractAmount", "totalIncome", "receivedAmount", "dueAmount", "paymentStatus", "createdAt"]
+    },
+    "VehicleMonthlyMileage": {
+      "title": "VehicleMonthlyMileage",
+      "description": "Monthly odometer and distance records",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "vehicleNo": { "type": "string", "maxLength": 64 },
+        "month": { "type": "number" },
+        "year": { "type": "number" },
+        "startOdometer": { "type": "number" },
+        "endOdometer": { "type": "number" },
+        "totalKmRun": { "type": "number" },
+        "totalTrips": { "type": "number" },
+        "remarks": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "vehicleNo", "month", "year", "totalKmRun", "createdAt"]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized administrator user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["admin", "superadmin"] },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/vehicles/{vehicleId}": {
+      "schema": "Vehicle",
+      "description": "Company fleet vehicles"
+    },
+    "/suppliers/{supplierId}": {
+      "schema": "Supplier",
+      "description": "Service providers and fuel stations"
+    },
+    "/maintenance/{maintenanceId}": {
+      "schema": "MaintenanceTransaction",
+      "description": "Vehicle maintenance bills and workshop invoices"
+    },
+    "/fuel/{fuelId}": {
+      "schema": "FuelTransaction",
+      "description": "Fuel expenses and slips"
+    },
+    "/salaries/{salaryId}": {
+      "schema": "DriverSalaryTransaction",
+      "description": "Monthly driver salaries"
+    },
+    "/renewals/{renewalId}": {
+      "schema": "DocumentRenewal",
+      "description": "Vehicle paper and legal renewals"
+    },
+    "/fines/{fineId}": {
+      "schema": "PoliceCase",
+      "description": "Police cases and traffic violation fines"
+    },
+    "/other/{otherId}": {
+      "schema": "OtherExpense",
+      "description": "Other vehicle operations expenses"
+    },
+    "/incomes/{incomeId}": {
+      "schema": "VehicleMonthlyIncome",
+      "description": "Vehicle monthly trip and contract revenue"
+    },
+    "/mileages/{mileageId}": {
+      "schema": "VehicleMonthlyMileage",
+      "description": "Monthly vehicle distance and odometer runs"
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "System fleet administrators"
+    }
+  }
+}

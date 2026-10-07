@@ -1,0 +1,264 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'ashraf170787@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validators
+    function isValidVehicle(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.vehicleNo is string && data.vehicleNo.size() > 0 && data.vehicleNo.size() <= 64 &&
+             data.vehicleType is string && data.vehicleType.size() <= 64 &&
+             data.vehicleModel is string && data.vehicleModel.size() <= 64 &&
+             data.driverName is string && data.driverName.size() <= 128 &&
+             data.status in ['Active', 'Inactive'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidSupplier(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 128 &&
+             data.category is string && data.category.size() <= 64 &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidMaintenance(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.serviceType is string && data.serviceType.size() <= 64 &&
+             data.partsDescription is string && data.partsDescription.size() <= 500 &&
+             data.supplier is string && data.supplier.size() <= 128 &&
+             data.amount is number &&
+             data.paidAmount is number &&
+             data.dueAmount is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidFuel(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.fuelType is string && data.fuelType.size() <= 32 &&
+             data.quantity is number &&
+             data.unitPrice is number &&
+             data.totalAmount is number &&
+             data.supplier is string && data.supplier.size() <= 128 &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidSalary(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.month is number &&
+             data.year is number &&
+             data.driverName is string && data.driverName.size() <= 128 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.basicSalary is number &&
+             data.netSalary is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidRenewal(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.documentType is string && data.documentType.size() <= 64 &&
+             data.documentNumber is string && data.documentNumber.size() <= 128 &&
+             data.expiryDate is string && data.expiryDate.size() <= 32 &&
+             data.renewalDate is string && data.renewalDate.size() <= 32 &&
+             data.renewalCost is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidFine(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.caseType is string && data.caseType.size() <= 64 &&
+             data.caseNumber is string && data.caseNumber.size() <= 128 &&
+             data.amount is number &&
+             data.paidAmount is number &&
+             data.dueAmount is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidOther(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.date is string && data.date.size() <= 32 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.expenseType is string && data.expenseType.size() <= 64 &&
+             data.description is string && data.description.size() <= 500 &&
+             data.amount is number &&
+             data.paidAmount is number &&
+             data.dueAmount is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid', 'Due', 'Overdue'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidIncome(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.month is number &&
+             data.year is number &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.clientName is string && data.clientName.size() <= 128 &&
+             data.billingType is string && data.billingType.size() <= 64 &&
+             data.contractAmount is number &&
+             data.totalIncome is number &&
+             data.receivedAmount is number &&
+             data.dueAmount is number &&
+             data.paymentStatus in ['Paid', 'Partial', 'Unpaid'] &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidMileage(data) {
+      return data.id is string && data.id.size() <= 128 &&
+             data.vehicleNo is string && data.vehicleNo.size() <= 64 &&
+             data.month is number &&
+             data.year is number &&
+             data.totalKmRun is number &&
+             data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow get: if isVerifiedUser();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin() && isValidId(adminId);
+    }
+
+    // Vehicles Collection
+    match /vehicles/{vehicleId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(vehicleId) && isValidVehicle(incoming());
+      allow update: if isVerifiedUser() && isValidId(vehicleId) && isValidVehicle(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(vehicleId);
+    }
+
+    // Suppliers Collection
+    match /suppliers/{supplierId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(supplierId) && isValidSupplier(incoming());
+      allow update: if isVerifiedUser() && isValidId(supplierId) && isValidSupplier(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(supplierId);
+    }
+
+    // Maintenance Collection
+    match /maintenance/{maintenanceId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(maintenanceId) && isValidMaintenance(incoming());
+      allow update: if isVerifiedUser() && isValidId(maintenanceId) && isValidMaintenance(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(maintenanceId);
+    }
+
+    // Fuel Collection
+    match /fuel/{fuelId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(fuelId) && isValidFuel(incoming());
+      allow update: if isVerifiedUser() && isValidId(fuelId) && isValidFuel(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(fuelId);
+    }
+
+    // Salaries Collection
+    match /salaries/{salaryId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(salaryId) && isValidSalary(incoming());
+      allow update: if isVerifiedUser() && isValidId(salaryId) && isValidSalary(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(salaryId);
+    }
+
+    // Renewals Collection
+    match /renewals/{renewalId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(renewalId) && isValidRenewal(incoming());
+      allow update: if isVerifiedUser() && isValidId(renewalId) && isValidRenewal(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(renewalId);
+    }
+
+    // Fines Collection
+    match /fines/{fineId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(fineId) && isValidFine(incoming());
+      allow update: if isVerifiedUser() && isValidId(fineId) && isValidFine(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(fineId);
+    }
+
+    // Other Collection
+    match /other/{otherId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(otherId) && isValidOther(incoming());
+      allow update: if isVerifiedUser() && isValidId(otherId) && isValidOther(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(otherId);
+    }
+
+    // Incomes Collection
+    match /incomes/{incomeId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(incomeId) && isValidIncome(incoming());
+      allow update: if isVerifiedUser() && isValidId(incomeId) && isValidIncome(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(incomeId);
+    }
+
+    // Mileages Collection
+    match /mileages/{mileageId} {
+      allow get, list: if isVerifiedUser();
+      allow create: if isVerifiedUser() && isValidId(mileageId) && isValidMileage(incoming());
+      allow update: if isVerifiedUser() && isValidId(mileageId) && isValidMileage(incoming()) &&
+                       incoming().id == existing().id &&
+                       incoming().createdAt == existing().createdAt;
+      allow delete: if isVerifiedUser() && isValidId(mileageId);
+    }
+  }
+}

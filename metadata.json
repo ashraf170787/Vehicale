@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Vehicle Cost Management \u0026 Tracking",
+  "description": "Factory and company vehicle cost management system tracking maintenance, fuel, driver salary, document renewals, police fines, and 5-year cost analysis with Excel import.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
